@@ -1,0 +1,7 @@
+# Core dependencies
+# No external packages required for the base script, 
+# but these are recommended for development and testing:
+
+pytest>=7.0.0
+black>=23.0.0
+mypy>=1.0.0

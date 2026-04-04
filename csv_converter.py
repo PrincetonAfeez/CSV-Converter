@@ -178,7 +178,25 @@ def run(input_text: str, config: dict | None = None) -> dict:
                     "message": f"Line {line_number} appears to mix delimiters while {repr(delimiter)} is primary.",
                 }
             )
-
+    
+    first_row = raw_rows[0]
+    if looks_like_header(first_row):
+        headers, header_findings = normalize_headers(first_row)
+        data_rows = raw_rows[1:]
+        header_status = "provided"
+    else:
+        headers = [f"column_{index}" for index in range(1, len(first_row) + 1)]
+        header_findings = [
+            {
+                "severity": "medium",
+                "category": "missing_header",
+                "line": 1,
+                "message": "First row did not look like a header, so column_1 style headers were generated.",
+            }
+        ]
+        data_rows = raw_rows
+        header_status = "generated"
+    findings.extend(header_findings)
 
 
 

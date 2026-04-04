@@ -13,6 +13,17 @@ from pathlib import Path
 
 import string_sanitizer
 
+DELIMITER_LABELS = {"auto": None, ",": ",", ";": ";", "|": "|", "tab": "\t"} 
+
+
+
+
+
+
+
+
+
+
 
 
 def main():

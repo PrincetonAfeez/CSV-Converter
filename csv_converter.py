@@ -163,7 +163,21 @@ def run(input_text: str, config: dict | None = None) -> dict:
             "column_profiles": [],
             "summary": "No rows were converted because the input was empty.",
         }
-
+    mixed_delimiter_lines = []
+    for line_number, line in enumerate(lines[:100], start=1):
+        if not line.strip():
+            continue
+        other_counts = {candidate: line.count(candidate) for candidate in [",", ";", "\t", "|"] if candidate != delimiter}
+        if any(count > line.count(delimiter) and count > 0 for count in other_counts.values()):
+            mixed_delimiter_lines.append(line_number)
+            findings.append(
+                {
+                    "severity": "low",
+                    "category": "mixed_delimiter",
+                    "line": line_number,
+                    "message": f"Line {line_number} appears to mix delimiters while {repr(delimiter)} is primary.",
+                }
+            )
 
 
 

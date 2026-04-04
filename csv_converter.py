@@ -349,7 +349,21 @@ def run(input_text: str, config: dict | None = None) -> dict:
         f"Converted {len(converted_rows)} rows to JSON, repaired {repaired_rows}, rejected {rejected_rows}. "
         f"{delim_part}{rate_part}"
     )
-
+    
+    return {
+        "module_name": "csv",
+        "title": "DataGuard CSV Doctor Report",
+        "output": output_json,
+        "rows": converted_rows,
+        "quarantine_rows": quarantine_rows,
+        "findings": findings,
+        "warnings": [f"{rejected_rows} rows were rejected."] if rejected_rows else [],
+        "errors": [],
+        "stats": stats,
+        "metadata": metadata,
+        "column_profiles": [{"name": header, "type": inferred_types[header], "completeness": completeness[header]} for header in headers],
+        "summary": summary,
+    }
 
 
 

@@ -104,6 +104,17 @@ def detect_type(values: list[str | None]) -> str:
         return "float"
     return "string"
 
+def convert_value(value: str | None, target_type: str):
+    if value is None:
+        return None
+    if target_type == "boolean":
+        return str(value).lower() in {"true", "yes", "1", "y"}
+    if target_type == "integer":
+        return int(str(value).replace(",", "").replace("$", ""))
+    if target_type == "float":
+        cleaned = str(value).replace(",", "").replace("$", "").rstrip("%")
+        return float(cleaned)
+    return value
 
 
 

@@ -449,6 +449,16 @@ def main(argv: list[str] | None = None) -> int:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(result["output"], encoding="utf-8")
 
+    if ns.quarantine:
+        qpath = Path(ns.quarantine)
+        delim = result.get("metadata", {}).get("delimiter_char", ",")
+        write_quarantine_csv(qpath, result.get("quarantine_rows") or [], delim)
+
+    if ns.report:
+        print_report(result)
+
+    return 0
+
 
 
 

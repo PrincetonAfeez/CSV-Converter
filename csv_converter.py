@@ -116,6 +116,12 @@ def convert_value(value: str | None, target_type: str):
         return float(cleaned)
     return value
 
+def run(input_text: str, config: dict | None = None) -> dict:
+    config = config or {}
+    sanitized = string_sanitizer.run(input_text, {"source_name": config.get("source_name", "<input>")})
+    cleaned_text = sanitized["output"]
+    lines = cleaned_text.splitlines()
+    findings = list(sanitized["findings"])
 
 
 

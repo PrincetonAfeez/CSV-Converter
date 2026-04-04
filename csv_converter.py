@@ -310,6 +310,25 @@ def run(input_text: str, config: dict | None = None) -> dict:
         non_null = sum(1 for value in values if value is not None)
         completeness[header] = round((non_null / max(len(values), 1)) * 100, 1)
 
+    output_json = json.dumps(converted_rows, indent=2, ensure_ascii=False)
+    rows_attempted = len(converted_rows) + rejected_rows
+    if rows_attempted:
+        acceptance_pct = round((len(converted_rows) / rows_attempted) * 100, 1)
+    else:
+        acceptance_pct = 100.0
+    stats = {
+        "rows_converted": len(converted_rows),
+        "rows_repaired": repaired_rows,
+        "rows_rejected": rejected_rows,
+        "rows_attempted": rows_attempted,
+        "row_acceptance_rate_pct": acceptance_pct,
+        "delimiter": repr(delimiter),
+        "delimiter_confidence": confidence,
+        "header_status": header_status,
+        "expected_columns": expected_columns,
+        "mixed_delimiter_lines": len(mixed_delimiter_lines),
+        "type_mismatches": type_mismatches,
+    }
 
 
 

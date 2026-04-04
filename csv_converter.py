@@ -14,6 +14,8 @@ from pathlib import Path
 import string_sanitizer
 
 DELIMITER_LABELS = {"auto": None, ",": ",", ";": ";", "|": "|", "tab": "\t"} 
+EMPTY_CELL_VALUES = {"", "n/a", "null", "-", "--", "none", "na"} 
+
 
 
 

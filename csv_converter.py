@@ -197,7 +197,14 @@ def run(input_text: str, config: dict | None = None) -> dict:
         data_rows = raw_rows
         header_status = "generated"
     findings.extend(header_findings)
-
+    
+    expected_columns = len(headers)
+    strict_mode = bool(config.get("strict"))
+    no_types = bool(config.get("no_types"))
+    repaired_rows = 0
+    rejected_rows = 0
+    quarantine_rows = []
+    converted_rows = []
 
 
 

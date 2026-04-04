@@ -222,7 +222,30 @@ def run(input_text: str, config: dict | None = None) -> dict:
 
         row_dict = {}
         overflow_values = None
-
+        
+        if len(row) < expected_columns:
+            if strict_mode:
+                rejected_rows += 1
+                quarantine_rows.append(raw_row)
+                findings.append(
+                    {
+                        "severity": "medium",
+                        "category": "strict_rejection",
+                        "line": row_index,
+                        "message": f"Strict mode rejected short row with {len(row)} columns.",
+                    }
+                )
+                continue
+            row.extend([""] * (expected_columns - len(row)))
+            repaired_rows += 1
+            findings.append(
+                {
+                    "severity": "low",
+                    "category": "row_padding",
+                    "line": row_index,
+                    "message": f"Padded short row from {len(raw_row)} to {expected_columns} columns.",
+                }
+            )
 
 
 

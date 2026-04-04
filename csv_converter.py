@@ -205,6 +205,24 @@ def run(input_text: str, config: dict | None = None) -> dict:
     rejected_rows = 0
     quarantine_rows = []
     converted_rows = []
+    for row_index, raw_row in enumerate(data_rows, start=2 if header_status == "provided" else 1):
+        row = list(raw_row)
+        if len(row) < max(1, expected_columns // 2):
+            rejected_rows += 1
+            findings.append(
+                {
+                    "severity": "medium",
+                    "category": "rejected_row",
+                    "line": row_index,
+                    "message": f"Row had only {len(row)} columns versus expected {expected_columns}.",
+                }
+            )
+            quarantine_rows.append(raw_row)
+            continue
+
+        row_dict = {}
+        overflow_values = None
+
 
 
 

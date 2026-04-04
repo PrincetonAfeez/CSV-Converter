@@ -330,6 +330,25 @@ def run(input_text: str, config: dict | None = None) -> dict:
         "type_mismatches": type_mismatches,
     }
 
+    metadata = {
+        "source": config.get("source_name", "<input>"),
+        "delimiter": repr(delimiter),
+        "delimiter_char": delimiter,
+        "header_status": header_status,
+    }
+
+    if confidence == "manual":
+        delim_part = f"Delimiter {repr(delimiter)} (manual override)."
+    else:
+        delim_part = f"Delimiter {repr(delimiter)} with {confidence} confidence."
+    if rows_attempted:
+        rate_part = f" Row acceptance {acceptance_pct}% ({len(converted_rows)}/{rows_attempted} data rows)."
+    else:
+        rate_part = " No data rows after the header."
+    summary = (
+        f"Converted {len(converted_rows)} rows to JSON, repaired {repaired_rows}, rejected {rejected_rows}. "
+        f"{delim_part}{rate_part}"
+    )
 
 
 

@@ -271,7 +271,13 @@ def run(input_text: str, config: dict | None = None) -> dict:
                     "message": "Moved extra columns into _overflow.",
                 }
             )
+        
+        for header, value in zip(headers, row):
+            row_dict[header] = clean_cell(value)
+        if overflow_values:
+            row_dict["_overflow"] = [clean_cell(value) for value in overflow_values]
 
+        converted_rows.append(row_dict)
 
 
 

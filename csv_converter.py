@@ -122,7 +122,15 @@ def run(input_text: str, config: dict | None = None) -> dict:
     cleaned_text = sanitized["output"]
     lines = cleaned_text.splitlines()
     findings = list(sanitized["findings"])
+    
+    delimiter_flag = config.get("delimiter", "auto")
+    if delimiter_flag == "auto":
+        delimiter, confidence = detect_delimiter(lines)
+    else:
+        delimiter = DELIMITER_LABELS.get(delimiter_flag, delimiter_flag)
+        confidence = "manual"
 
+    raw_rows = parse_csv_rows(cleaned_text, delimiter)
 
 
 

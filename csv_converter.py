@@ -37,6 +37,69 @@ def looks_like_header(row: list[str]) -> bool:
         return False
     return any(cell for cell in cleaned)
 
+def normalize_headers(header_row: list[str]) -> tuple[list[str], list[dict]]:
+    findings = []
+    normalized = []
+    seen = Counter()
+
+    for index, raw_header in enumerate(header_row, start=1):
+        header = raw_header.strip()
+        # If a header is missing, generate a placeholder name and log a finding
+        if not header:
+            header = f"unnamed_column_{index}"
+            findings.append(
+                {
+                    "severity": "low",
+                    "category": "header_repair",
+                    "line": 1,
+                    "message": f"Header {index} was empty and became {header}.",
+                }
+            )
+        elif header != raw_header:
+            findings.append(
+                {
+                    "severity": "low",
+                    "category": "header_trim",
+                    "line": 1,
+                    "message": f"Trimmed whitespace in header {raw_header!r}.",
+                }
+            )
+
+        seen[header] += 1
+        if seen[header] > 1:
+            new_header = f"{header}_{seen[header]}"
+            findings.append(
+                {
+                    "severity": "low",
+                    "category": "duplicate_header",
+                    "line": 1,
+                    "message": f"Duplicate header {header!r} renamed to {new_header}.",
+                }
+            )
+            header = new_header
+
+        normalized.append(header)
+
+    return normalized, findings
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

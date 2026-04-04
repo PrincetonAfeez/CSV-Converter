@@ -409,6 +409,46 @@ def print_report(result: dict) -> None:
     if len(findings) > 200:
         print(f"  ... and {len(findings) - 200} more")
 
+def main(argv: list[str] | None = None) -> int:
+    from errors import InputError
+
+    parser = argparse.ArgumentParser(description="Repair CSV and convert to JSON with diagnostics.")
+    parser.add_argument("--file", "-f", required=True, help="Input CSV file path")
+    parser.add_argument("--output", "-o", default="output.json", help="Output JSON path (default: output.json)")
+    parser.add_argument(
+        "--delimiter",
+        "-d",
+        default="auto",
+        choices=["auto", ",", ";", "|", "tab"],
+        help="Field delimiter or auto-detect (default: auto)",
+    )
+    parser.add_argument("--strict", action="store_true", help="Reject rows with wrong column count instead of repairing")
+    parser.add_argument("--quarantine", metavar="PATH", help="Write rejected rows to this CSV file")
+    parser.add_argument("--no-types", action="store_true", dest="no_types", help="Skip type inference; keep string values")
+    parser.add_argument("--report", action="store_true", help="Print full diagnostic report to stdout")
+    ns = parser.parse_args(argv)
+
+    path = Path(ns.file)
+    try:
+        input_text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        print(InputError(f"Could not read {path}: {exc}"), file=sys.stderr)
+        return 1
+
+    result = run(
+        input_text,
+        {
+            "source_name": str(path.resolve()),
+            "delimiter": ns.delimiter,
+            "strict": ns.strict,
+            "no_types": ns.no_types,
+        },
+    )
+
+    out_path = Path(ns.output)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(result["output"], encoding="utf-8")
+
 
 
 

@@ -246,7 +246,31 @@ def run(input_text: str, config: dict | None = None) -> dict:
                     "message": f"Padded short row from {len(raw_row)} to {expected_columns} columns.",
                 }
             )
-
+        
+        elif len(row) > expected_columns:
+            overflow_values = row[expected_columns:]
+            if strict_mode:
+                rejected_rows += 1
+                quarantine_rows.append(raw_row)
+                findings.append(
+                    {
+                        "severity": "medium",
+                        "category": "strict_rejection",
+                        "line": row_index,
+                        "message": f"Strict mode rejected long row with {len(row)} columns.",
+                    }
+                )
+                continue
+            row = row[:expected_columns]
+            repaired_rows += 1
+            findings.append(
+                {
+                    "severity": "low",
+                    "category": "row_overflow",
+                    "line": row_index,
+                    "message": "Moved extra columns into _overflow.",
+                }
+            )
 
 
 

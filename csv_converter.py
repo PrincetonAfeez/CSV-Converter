@@ -132,6 +132,37 @@ def run(input_text: str, config: dict | None = None) -> dict:
 
     raw_rows = parse_csv_rows(cleaned_text, delimiter)
 
+    if not raw_rows:
+        return {
+            "module_name": "csv",
+            "title": "DataGuard CSV Doctor Report",
+            "output": "[]",
+            "rows": [],
+            "quarantine_rows": [],
+            "findings": findings,
+            "warnings": ["CSV input was empty."],
+            "errors": [],
+            "stats": {
+                "rows_converted": 0,
+                "rows_repaired": 0,
+                "rows_rejected": 0,
+                "rows_attempted": 0,
+                "row_acceptance_rate_pct": 0.0,
+                "delimiter": repr(delimiter),
+                "delimiter_confidence": confidence,
+                "header_status": "none",
+                "expected_columns": 0,
+                "mixed_delimiter_lines": 0,
+                "type_mismatches": 0,
+            },
+            "metadata": {
+                "source": config.get("source_name", "<input>"),
+                "delimiter": repr(delimiter),
+                "delimiter_char": delimiter,
+            },
+            "column_profiles": [],
+            "summary": "No rows were converted because the input was empty.",
+        }
 
 
 

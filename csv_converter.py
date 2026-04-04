@@ -92,6 +92,17 @@ def clean_cell(value: str) -> str | None:
         return None
     return trimmed
 
+def detect_type(values: list[str | None]) -> str:
+    non_empty = [value for value in values if value not in {None, ""}]
+    if not non_empty:
+        return "empty"
+    if all(str(value).lower() in {"true", "false", "yes", "no", "1", "0", "y", "n"} for value in non_empty):
+        return "boolean"
+    if all(re.fullmatch(r"-?\d+", str(value)) for value in non_empty):
+        return "integer"
+    if all(re.fullmatch(r"-?\d+(?:\.\d+)?%?", str(value).replace(",", "").replace("$", "")) for value in non_empty):
+        return "float"
+    return "string"
 
 
 

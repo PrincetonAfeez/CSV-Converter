@@ -82,6 +82,9 @@ def normalize_headers(header_row: list[str]) -> tuple[list[str], list[dict]]:
 
     return normalized, findings
 
+def parse_csv_rows(text: str, delimiter: str) -> list[list[str]]:
+    reader = csv.reader(io.StringIO(text, newline=""), delimiter=delimiter)
+    return [row for row in reader]
 
 
 

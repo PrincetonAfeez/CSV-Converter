@@ -278,7 +278,11 @@ def run(input_text: str, config: dict | None = None) -> dict:
             row_dict["_overflow"] = [clean_cell(value) for value in overflow_values]
 
         converted_rows.append(row_dict)
-
+    
+    column_values: dict[str, list] = {header: [] for header in headers}
+    for row in converted_rows:
+        for header in headers:
+            column_values[header].append(row.get(header))
 
 
 

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/csv.result.schema.json",
+  "title": "CSV Converter Result",
+  "description": "Schema for the result object returned by csv_converter.run().",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module_name",
+    "title",
+    "output",
+    "rows",
+    "quarantine_rows",
+    "findings",
+    "warnings",
+    "errors",
+    "stats",
+    "metadata",
+    "column_profiles",
+    "summary"
+  ],
+  "properties": {
+    "module_name": {
+      "type": "string",
+      "const": "csv"
+    },
+    "title": {
+      "type": "string"
+    },
+    "output": {
+      "type": "string",
+      "description": "Pretty-printed JSON array as a string."
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "$ref": "csv.row.schema.json"
+      }
+    },
+    "quarantine_rows": {
+      "type": "array",
+      "items": {
+        "$ref": "csv.quarantine_row.schema.json"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "common.finding.schema.json"
+      }
+    },
+    "warnings": {
+      "$ref": "common.string_list.schema.json"
+    },
+    "errors": {
+      "$ref": "common.string_list.schema.json"
+    },
+    "stats": {
+      "$ref": "csv.stats.schema.json"
+    },
+    "metadata": {
+      "$ref": "csv.metadata.schema.json"
+    },
+    "column_profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "csv.column_profile.schema.json"
+      }
+    },
+    "summary": {
+      "type": "string"
+    }
+  }
+}

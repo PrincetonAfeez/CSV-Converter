@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/csv.quarantine_row.schema.json",
+  "title": "Quarantine CSV Row",
+  "type": "array",
+  "items": {
+    "type": "string"
+  }
+}

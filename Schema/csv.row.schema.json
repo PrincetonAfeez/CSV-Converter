@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/csv.row.schema.json",
+  "title": "CSV Output Row",
+  "description": "A normalized output row keyed by detected or generated headers. May include _overflow.",
+  "type": "object",
+  "additionalProperties": {
+    "anyOf": [
+      {
+        "$ref": "common.scalar.schema.json"
+      },
+      {
+        "type": "array",
+        "items": {
+          "$ref": "common.scalar.schema.json"
+        }
+      }
+    ]
+  }
+}

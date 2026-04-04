@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/csv.stats.schema.json",
+  "title": "CSV Conversion Stats",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "rows_converted",
+    "rows_repaired",
+    "rows_rejected",
+    "rows_attempted",
+    "row_acceptance_rate_pct",
+    "delimiter",
+    "delimiter_confidence",
+    "header_status",
+    "expected_columns",
+    "mixed_delimiter_lines",
+    "type_mismatches"
+  ],
+  "properties": {
+    "rows_converted": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rows_repaired": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rows_rejected": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rows_attempted": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "row_acceptance_rate_pct": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "delimiter": {
+      "type": "string",
+      "description": "repr(delimiter), for example ',' or '\\t'."
+    },
+    "delimiter_confidence": {
+      "type": "string",
+      "enum": [
+        "high",
+        "low",
+        "manual"
+      ]
+    },
+    "header_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "provided",
+        "generated"
+      ]
+    },
+    "expected_columns": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "mixed_delimiter_lines": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "type_mismatches": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/csv.config.schema.json",
+  "title": "CSV Converter Config",
+  "description": "Supported config object for csv_converter.run(input_text, config).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_name": {
+      "type": "string"
+    },
+    "delimiter": {
+      "type": "string",
+      "enum": [
+        "auto",
+        ",",
+        ";",
+        "|",
+        "tab",
+        "\t"
+      ]
+    },
+    "strict": {
+      "type": "boolean"
+    },
+    "no_types": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/csv.metadata.schema.json",
+  "title": "CSV Report Metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source",
+    "delimiter",
+    "delimiter_char"
+  ],
+  "properties": {
+    "source": {
+      "type": "string"
+    },
+    "delimiter": {
+      "type": "string"
+    },
+    "delimiter_char": {
+      "type": "string",
+      "minLength": 1
+    },
+    "header_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "provided",
+        "generated"
+      ]
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/common.string_list.schema.json",
+  "title": "String List",
+  "type": "array",
+  "items": {
+    "type": "string"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/sanitize.result.schema.json",
+  "title": "Sanitizer Result",
+  "description": "Schema for the result object returned by string_sanitizer.run().",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module_name",
+    "title",
+    "output",
+    "findings",
+    "warnings",
+    "errors",
+    "stats",
+    "metadata",
+    "summary"
+  ],
+  "properties": {
+    "module_name": {
+      "type": "string",
+      "const": "sanitize"
+    },
+    "title": {
+      "type": "string"
+    },
+    "output": {
+      "type": "string"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "common.finding.schema.json"
+      }
+    },
+    "warnings": {
+      "$ref": "common.string_list.schema.json"
+    },
+    "errors": {
+      "$ref": "common.string_list.schema.json"
+    },
+    "stats": {
+      "$ref": "sanitize.stats.schema.json"
+    },
+    "metadata": {
+      "$ref": "sanitize.metadata.schema.json"
+    },
+    "summary": {
+      "type": "string"
+    }
+  }
+}

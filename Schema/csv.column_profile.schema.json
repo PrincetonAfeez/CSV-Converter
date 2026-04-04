@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/csv.column_profile.schema.json",
+  "title": "CSV Column Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "type",
+    "completeness"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "boolean",
+        "integer",
+        "float",
+        "string",
+        "empty"
+      ]
+    },
+    "completeness": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/sanitize.stats.schema.json",
+  "title": "Sanitizer Stats",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bom_markers",
+    "ansi_codes",
+    "control_characters",
+    "unicode_whitespace",
+    "smart_quotes",
+    "zero_width_characters",
+    "severity_breakdown",
+    "original_characters",
+    "cleaned_characters",
+    "characters_removed_or_replaced"
+  ],
+  "properties": {
+    "bom_markers": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ansi_codes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "control_characters": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unicode_whitespace": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "smart_quotes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "zero_width_characters": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "severity_breakdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "low": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "medium": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "high": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "original_characters": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "cleaned_characters": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "characters_removed_or_replaced": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

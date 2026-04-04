@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/sanitize.config.schema.json",
+  "title": "Sanitizer Config",
+  "description": "Supported config object for string_sanitizer.run(input_text, config).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_name": {
+      "type": "string"
+    }
+  }
+}

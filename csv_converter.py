@@ -29,7 +29,13 @@ def detect_delimiter(lines: list[str]) -> tuple[str, str]:
     confidence = "high" if len(sorted_counts) < 2 or sorted_counts[0] >= sorted_counts[1] * 1.5 else "low"
     return best, confidence
 
-
+def looks_like_header(row: list[str]) -> bool:
+    if not row:
+        return False
+    cleaned = [cell.strip() for cell in row]
+    if all(re.fullmatch(r"-?\d+(?:\.\d+)?", cell or "") for cell in cleaned if cell):
+        return False
+    return any(cell for cell in cleaned)
 
 
 

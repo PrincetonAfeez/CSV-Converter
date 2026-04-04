@@ -86,7 +86,11 @@ def parse_csv_rows(text: str, delimiter: str) -> list[list[str]]:
     reader = csv.reader(io.StringIO(text, newline=""), delimiter=delimiter)
     return [row for row in reader]
 
-
+def clean_cell(value: str) -> str | None:
+    trimmed = value.strip()
+    if trimmed.lower() in EMPTY_CELL_VALUES:
+        return None
+    return trimmed
 
 
 

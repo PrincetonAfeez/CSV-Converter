@@ -1,108 +1,108 @@
-App: CLI CSV-to-JSON Converter & Repairer
+# CSV repair and JSON conversion (DataGuard CSV Doctor)
 
-What it does: Ingests a CSV file and diagnoses its problems: missing headers, inconsistent column counts, empty cells, mixed delimiters (commas vs. semicolons vs. tabs), encoding issues, quoted fields with embedded newlines. Repairs what it can (with warnings), rejects what it can't (with explanations), and outputs a clean JSON file.
+Ingests CSV text, sanitizes common encoding and invisible-character issues, optionally auto-detects delimiters, repairs structural problems where possible, infers column types, and emits a JSON array of objects plus a structured diagnostic report.
 
-Why it matters: CSV is the most common data exchange format and the most consistently broken. Handling every edge case is a masterclass in defensive programming.
+## Why it exists
 
-Key skills: RegEx for delimiter detection, encoding detection, the CSV module's edge cases, JSON serialization with type inference (string vs. number vs. boolean vs. null), and validation reporting.
+CSV is the default interchange format and often arrives with inconsistent columns, duplicated headers, placeholder “empty” tokens, and messy encodings. This tool is defensive: it repairs what it can, quarantines what it rejects, and explains both in `findings` and `stats`.
 
-Standalone value: Fix any broken CSV and convert it to clean JSON.
+## How to run
 
-Mega-app role: dataguard/csv_doctor.py — handles tabular data in the pipeline.
+**CLI** (from this directory, with Python 3.10+):
 
-Features:
-CLI Interface
-•	--file flag (required) pointing to the input CSV
-•	--output flag for JSON destination (defaults to output.json)
-•	--delimiter flag to force a delimiter or auto-detect (default: auto)
-•	--strict flag to reject all rows with any issue instead of repairing them
-•	--quarantine flag to write rejected rows to a separate CSV file for review
-•	--no-types flag to skip data type inference and treat all values as strings
-•	--report flag to print the full diagnostic report to terminal
+```bash
+python csv_converter.py --file path/to/data.csv --output out.json
+```
 
-Delimiter Detection
-•	Auto-detection by counting commas, semicolons, tabs, and pipes across the first 10 lines
-•	Confidence label: high if one delimiter dominates, low if counts are close
-•	Mixed delimiter warnings per line: Line 47 uses semicolons but the rest uses commas
-•	Manual override via --delimiter flag
+| Flag | Description |
+|------|-------------|
+| `--file` / `-f` | Input CSV path (**required**) |
+| `--output` / `-o` | Output JSON path (default: `output.json`) |
+| `--delimiter` / `-d` | `auto` (default), `,`, `;`, `|`, or `tab` |
+| `--strict` | Reject rows with short/long column counts instead of padding or `_overflow` |
+| `--quarantine PATH` | Write rejected rows as CSV (same delimiter as the parse) |
+| `--no-types` | Skip type casting; keep cell values as strings |
+| `--report` | Print stats, metadata, column profiles, warnings, and findings to stdout |
 
-Header Diagnosis & Repair
-•	Detects if the first row is a header by checking: all-string values, no duplicates, not purely numeric
-•	Missing headers auto-generated as column_1, column_2, etc. with a warning
-•	Duplicate headers get _2, _3 suffixes; empty headers become unnamed_column_N
-•	Whitespace in headers trimmed with a notice
+Reading the input file uses UTF-8. Failures to open or read the file exit with code `1` and raise an `errors.InputError`-style message on stderr.
 
-Column Count Consistency
-•	Expected column count established from the header row
-•	Too few columns: padded with null values at the end, with a warning per row
-•	Too many columns: extra values moved to an _overflow field, or truncated with a warning
-•	Data quality percentage reported: consistent rows vs. inconsistent rows
+**Library API**
 
-Empty Cell Handling
-•	Detects truly empty cells, whitespace-only cells, and placeholders: N/A, null, NULL, -, --, none
-•	All normalized to JSON null
-•	Per-column completeness score: percentage of non-null values
+```python
+import csv_converter
 
-Encoding Detection & Repair
-•	UTF-8 BOM detection and stripping
-•	Common mojibake pattern flagging (e.g., Ã© suggesting UTF-8 read as Latin-1)
-•	Control character stripping (0x00–0x1F except newline/tab) with a warning per occurrence
+result = csv_converter.run(csv_text, {
+    "source_name": "optional label for findings",
+    "delimiter": "auto",   # or ",", ";", "|", "tab"
+    "strict": False,
+    "no_types": False,
+})
+# result["output"]     # JSON string
+# result["rows"]       # list[dict]
+# result["findings"]   # list of diagnostic dicts
+# result["stats"]      # counts and rates
+# result["column_profiles"]  # name, inferred type, completeness %
+```
 
-Data Type Inference
-•	Per-column type sniffing: string, integer, float, boolean, or empty
-•	Type mismatch flagging: if a column is 90%+ numeric but has string outliers, those cells are flagged
-•	Boolean normalization: yes/no, true/false, 1/0, Y/N all converted to JSON true/false
-•	Numeric cleanup: strips currency symbols, thousand separators, trailing percent signs
+## Features (what the code actually does)
 
-Repair vs. Rejection Logic
-•	Repairable issues fixed automatically with a yellow warning: padding, normalization, trimming, duplicate headers
-•	Rejected rows excluded from JSON with a red error and explanation: unparseable lines, rows below 50% expected columns, binary garbage
-•	Quarantine list optionally written to a separate file via --quarantine
-•	Final tally: N rows converted, N repaired, N rejected
+### Input sanitization
 
-JSON Output
-•	Clean JSON array of objects, keys from header names, proper escaping
-•	Pretty-printed with 2-space indentation
+Handled by `string_sanitizer.py` before CSV parsing: UTF-8 BOM, control characters (except newline/tab), Unicode whitespace, smart quotes, zero-width characters, ANSI escapes, and common mojibake hints. Each fix can append to `findings`.
 
-Diagnostic Report
-•	File overview: total lines, delimiter, encoding, header status, column count
-•	Data quality scorecard: parse rate, column consistency, cell completeness, type consistency
-•	Per-column profile: name, inferred type, completeness, mismatches, repairs
-•	All printed to terminal as a structured section-by-section report
+### Delimiter detection
 
-Student-Level Code Style
-•	A character-by-character parser with state variables: inside_quotes, current_cell, current_row with comments at each transition
-•	Functions: detect_delimiter(), check_headers(), validate_column_counts(), infer_types()
-•	Names like lines_with_wrong_column_count and rows_sent_to_quarantine
-•	Uses only: re, csv, json, argparse, os, sys, collections
-•	Comments like # semicolons are common in European CSVs where commas are decimal separators
+Counts `,`, `;`, `\t`, and `|` on the first 10 non-empty lines. The delimiter with the highest total wins. **Ties** break in order: comma → semicolon → tab → pipe. Confidence is `high` if the winner is at least 1.5× the runner-up, else `low`.
 
-This is a structural repair tool designed to handle "malformed" tabular data. It goes far beyond a simple format change by applying defensive programming to fix common data entry errors.
-•	Automated Structural Discovery: It uses statistical analysis to "guess" the delimiter (comma, semicolon, pipe, or tab) with a calculated confidence score.
-•	Header Intelligence: It differentiates between data and headers using heuristics (checking for numeric density and uniqueness) and automatically repairs missing, empty, or duplicate column names.
-•	Row-Level Surgery: It detects "short" rows (missing columns) and "long" rows (extra columns). It pads short rows with nulls and moves extra data into a special _overflow field rather than deleting it.
-•	Schema Inference: The module scans every value in a column to determine the most likely data type (Integer, Float, Boolean, or String) and attempts to cast the data into those types for the final JSON output.
-•	Data Quality Profiling: It generates a "Completeness" metric for every column, telling the user exactly what percentage of their data is populated vs. null.
+**Mixed-delimiter warnings** compare delimiters on **raw text lines** (not per parsed field). Commas inside quoted RFC 4180 fields can therefore produce occasional false positives.
 
-The Tech Stack
-Technology	Role in the Project
-Python 3.10+	Utilizes defaultdict and Counter for high-performance data grouping and frequency analysis.
-csv Module	The fundamental parser used to handle RFC 4180 compliance and complex quoting scenarios.
-json Module	Used to serialize the repaired Python dictionaries into a web-ready, structured string.
-Regex (re)	Employed for "Type Discovery"—identifying patterns like currency, percentages, and numeric strings.
-io.StringIO	Enables "virtual file" processing, allowing the script to treat raw text strings as file streams for the CSV reader.
+### Headers
 
-1. Statistical Delimiter Detection
-By using collections.Counter to weigh delimiter candidates across the first several lines, the tool avoids the "Global Fail" common in static parsers. If a file uses ; instead of ,, the script adapts dynamically, making it much more resilient to varied regional data formats.
+The first row is treated as a header if it is not all numeric and has at least one non-empty cell. **Duplicate header labels** are still treated as headers; `normalize_headers()` renames duplicates to `name_2`, `name_3`, etc. Empty header cells become `unnamed_column_N`.
 
-2. Non-Destructive Overflow Handling
-Unlike standard CSV-to-JSON converters that crash or truncate data when a row has "too many" columns, this stack uses a "Quarantine & Overflow" logic. By saving extra data in an _overflow key, the tech stack ensures that zero data loss occurs during the conversion process.
+### Row repair
 
+- Expected width comes from the header row (or generated `column_N` names).
+- Rows shorter than half the expected width are **rejected** and listed in `quarantine_rows`.
+- Slightly short rows: padded with empty cells (unless `--strict`).
+- Long rows: truncated to the header width; extra cells go under `_overflow` as a list (unless `--strict`).
 
+### Empty cells
 
-3. In-Memory "Virtual" Streams
-The use of io.StringIO is a professional-grade choice for performance. It allows the script to leverage the speed of the C-based csv module without the overhead of writing temporary files to the hard drive, which is critical for processing large datasets quickly.
+After trimming, these (case-insensitive) become JSON `null`: empty string, `n/a`, `null`, `-`, `--`, `none`, `na`.
 
-4. Semantic Data Typing
-By combining re with a column-wide scan, the tech stack transforms "flat" text into "rich" data. Converting "true" into a Boolean True or "$1,200.50" into a Float 1200.5 significantly reduces the amount of work required for the next developer or system using this data.
+### Type inference
 
+Per column, if all non-empty values match boolean / integer / float patterns (including `,`, `$`, `%` stripping for numbers), that type is used. Otherwise the column stays string. When casting fails for a cell, that cell keeps its string value, `type_mismatches` increments, and a `type_mismatch` finding is added. There is **no** “90% rule”: every failed cast is reported.
+
+### Output shape
+
+- **`output`**: pretty-printed JSON (`indent=2`, `ensure_ascii=False`).
+- **`stats`**: includes `rows_converted`, `rows_repaired`, `rows_rejected`, `rows_attempted`, `row_acceptance_rate_pct`, delimiter info, `mixed_delimiter_lines`, `type_mismatches`, etc.
+- **`metadata`**: includes `delimiter` (repr), **`delimiter_char`** (actual separator character for tools), `header_status`, `source`.
+- **`column_profiles`**: `name`, inferred `type`, `completeness` (% non-null) based on values **after** `clean_cell` and **before** type casting (null placeholders already applied).
+
+### Parser
+
+Tabular splitting uses Python’s **`csv.reader`** (`io.StringIO`), not a custom character-by-character state machine.
+
+## Project layout
+
+| File | Role |
+|------|------|
+| `csv_converter.py` | `run()`, CLI (`main`), delimiter/header/row/type logic |
+| `string_sanitizer.py` | Pre-parse text cleanup and findings |
+| `errors.py` | `InputError` and other shared exceptions (CLI uses `InputError` for unreadable files) |
+
+## Development
+
+```bash
+pip install -r requirements.txt
+python -m pytest tests/ -v
+```
+
+Optional: `black`, `mypy` as listed in `requirements.txt`.
+
+## Mega-app role
+
+Intended as the tabular-ingest / “CSV doctor” step in a larger DataGuard-style pipeline: same contract as `run()` return value for downstream reporting or storage.

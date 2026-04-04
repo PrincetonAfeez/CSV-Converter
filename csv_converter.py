@@ -304,6 +304,11 @@ def run(input_text: str, config: dict | None = None) -> dict:
                             "message": f"Value {value!r} in column {header} did not fit inferred type {target_type}.",
                         }
                     )
+    
+    completeness = {}
+    for header, values in column_values.items():
+        non_null = sum(1 for value in values if value is not None)
+        completeness[header] = round((non_null / max(len(values), 1)) * 100, 1)
 
 
 

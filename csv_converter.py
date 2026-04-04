@@ -374,6 +374,41 @@ def write_quarantine_csv(path: Path, rows: list[list[str]], delimiter: str) -> N
         for row in rows:
             writer.writerow(list(row) + [""] * (width - len(row)))
 
+def print_report(result: dict) -> None:
+    title = result.get("title", "Report")
+    print(title)
+    print("=" * len(title))
+    print(result.get("summary", ""))
+    print()
+    print("Stats")
+    print("-----")
+    print(json.dumps(result.get("stats", {}), indent=2, ensure_ascii=False))
+    print()
+    print("Metadata")
+    print("--------")
+    print(json.dumps(result.get("metadata", {}), indent=2, ensure_ascii=False))
+    print()
+    profiles = result.get("column_profiles") or []
+    if profiles:
+        print("Column profiles")
+        print("---------------")
+        print(json.dumps(profiles, indent=2, ensure_ascii=False))
+        print()
+    warnings = result.get("warnings") or []
+    if warnings:
+        print("Warnings")
+        print("--------")
+        for w in warnings:
+            print(f"  - {w}")
+        print()
+    findings = result.get("findings") or []
+    print(f"Findings ({len(findings)})")
+    print("---------")
+    for item in findings[:200]:
+        print(f"  [{item.get('severity', '?')}] {item.get('message', '')}")
+    if len(findings) > 200:
+        print(f"  ... and {len(findings) - 200} more")
+
 
 
 

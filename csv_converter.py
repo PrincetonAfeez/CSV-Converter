@@ -364,6 +364,15 @@ def run(input_text: str, config: dict | None = None) -> dict:
         "column_profiles": [{"name": header, "type": inferred_types[header], "completeness": completeness[header]} for header in headers],
         "summary": summary,
     }
+def write_quarantine_csv(path: Path, rows: list[list[str]], delimiter: str) -> None:
+    if not rows:
+        return
+    width = max(len(r) for r in rows)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f, delimiter=delimiter)
+        for row in rows:
+            writer.writerow(list(row) + [""] * (width - len(row)))
 
 
 

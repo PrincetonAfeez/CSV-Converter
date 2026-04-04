@@ -283,7 +283,27 @@ def run(input_text: str, config: dict | None = None) -> dict:
     for row in converted_rows:
         for header in headers:
             column_values[header].append(row.get(header))
-
+    
+    inferred_types = {header: detect_type(values) for header, values in column_values.items()}
+    type_mismatches = 0
+    if not no_types:
+        for row_index, row in enumerate(converted_rows, start=1):
+            for header, target_type in inferred_types.items():
+                value = row.get(header)
+                if value is None or target_type in {"string", "empty"}:
+                    continue
+                try:
+                    row[header] = convert_value(value, target_type)
+                except ValueError:
+                    type_mismatches += 1
+                    findings.append(
+                        {
+                            "severity": "low",
+                            "category": "type_mismatch",
+                            "line": row_index,
+                            "message": f"Value {value!r} in column {header} did not fit inferred type {target_type}.",
+                        }
+                    )
 
 
 

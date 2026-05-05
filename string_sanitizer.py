@@ -1,5 +1,9 @@
 """Text artifact sanitizer for invisible and unsafe character-level content."""
 
+# PINNED SNAPSHOT — sourced from https://github.com/PrincetonAfeez/String-Sanitizer
+# This is the original copy of string_sanitizer.py pinned at the version that passed
+# the DataGuard evaluation. Any updates must be replicated to all repositories within DataGuard.
+
 # Enable postponed evaluation of type annotations for forward references
 from __future__ import annotations
 
